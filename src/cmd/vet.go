@@ -50,7 +50,7 @@ func (v *vet) Run(c *context) error {
 	if err != nil {
 		return err
 	}
-	if status.Status == "PROCESSING" {
+	if status.Status == "PROCESSING" || status.Status == "PREPARING" {
 		fmt.Printf("waiting for inspection to finish...\n")
 		for {
 			time.Sleep(2 * time.Second)
