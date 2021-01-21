@@ -22,4 +22,12 @@ jobs:
       run: make generate-app-package
 
     - name: Vet Package
+      env:
+        SPLUNK_COM_USERNAME: ${{ secrets.SPLUNK_COM_USERNAME }}
+        SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
       run: make inspect-app
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: report.json
+        path: report.json
