@@ -19,7 +19,7 @@ jobs:
         go-version: 1.15
 
     - name: Generate Package
-      run: make genereate-app-package
+      run: make generate-app-package
 
     - name: Vet Package
       run: make inspect-app
