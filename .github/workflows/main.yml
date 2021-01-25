@@ -6,7 +6,7 @@ on: [push]
 
 jobs:
 
-  build:
+  install:
     runs-on: self-hosted
     steps:
     - uses: actions/checkout@v2
@@ -35,7 +35,7 @@ jobs:
       env:
         SPLUNK_COM_USERNAME: ${{ secrets.SPLUNK_COM_USERNAME }}
         SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
-        STACK_NAME: anekkanti-test1
+        STACK_NAME: ${{ secrets.STACK_NAME }}
         STACK_TOKEN: ${{ secrets.STACK_TOKEN }}
         ACS_URL: http://localhost:8443
       run: make install-app
