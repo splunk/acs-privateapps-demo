@@ -1,8 +1,15 @@
+build-cloudctl:
+	go build -o cloudCtl ./src/cmd
+
 generate-app-package:
-	tar -czvf app-package.tar.gz test-app
+	tar -czvf app-package.tar.gz testapp
 
 inspect-app:
-	go run ./src/cmd vet app-package.tar.gz --json-report-file=report.json
+	./cloudCtl vet app-package.tar.gz --json-report-file=report.json
 
+install-app:
+	./cloudCtl install ${STACK_NAME} app-package.tar.gz
 
+uninstall-app:
+	./cloudCtl uninstall ${STACK_NAME} testapp
 

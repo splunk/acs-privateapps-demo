@@ -16,6 +16,7 @@ type vet struct {
 	SplunkComUsername string `kong:"env='SPLUNK_COM_USERNAME',help='the splunkbase username'"`
 	SplunkComPassword string `kong:"env='SPLUNK_COM_PASSWORD',help='the splunkbase password'"`
 	JSONReportFile    string `kong:"help='the file to write the inspection report in json format',type='path'"`
+	ForSplunkCloud    bool   `kong:"env='FOR_SPLUNKCLOUD',help='perform inspections for splunk cloud',default='true'"`
 }
 
 func (v *vet) Run(c *context) error {
@@ -40,7 +41,7 @@ func (v *vet) Run(c *context) error {
 	if err != nil {
 		return err
 	}
-	submitRes, err := cli.Submit(filepath.Base(v.PackageFilePath), bytes.NewReader(pf))
+	submitRes, err := cli.Submit(filepath.Base(v.PackageFilePath), bytes.NewReader(pf), v.ForSplunkCloud)
 	if err != nil {
 		return err
 	}

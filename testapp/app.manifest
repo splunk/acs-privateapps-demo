@@ -4,7 +4,7 @@
     "title": "ACS Test Private App",
     "id": {
       "group": null,
-      "name": "acsTestPrivateApp",
+      "name": "testapp",
       "version": "0.0.1"
     },
     "author": [

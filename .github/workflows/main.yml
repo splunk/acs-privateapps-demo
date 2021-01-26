@@ -1,33 +1,47 @@
-name: Go
+---
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+name: InstallApp
+
+on: [push]
 
 jobs:
 
-  build:
-    runs-on: ubuntu-latest
+  install:
+    runs-on: self-hosted
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Repo
+      uses: actions/checkout@v2
 
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
         go-version: 1.15
 
+    - name: Build cloudCtl
+      run: make build-cloudctl
+
     - name: Generate Package
       run: make generate-app-package
 
-    - name: Vet Package
+    - name: Vet The Package - AppInspect
       env:
         SPLUNK_COM_USERNAME: ${{ secrets.SPLUNK_COM_USERNAME }}
         SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
+        STACK_NAME: anekkanti-test1
       run: make inspect-app
 
     - uses: actions/upload-artifact@v2
       with:
         name: report.json
         path: report.json
+
+    - name: Install The App On Stack - ACS
+      env:
+        SPLUNK_COM_USERNAME: ${{ secrets.SPLUNK_COM_USERNAME }}
+        SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
+        STACK_TOKEN: ${{ secrets.STACK_TOKEN }}
+        STACK_NAME: anekkanti-test1
+        ACS_URL: http://localhost:8443
+      run: make install-app
+
+
