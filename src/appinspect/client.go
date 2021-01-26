@@ -3,6 +3,7 @@ package appinspect
 import (
 	"fmt"
 	"io"
+	"net/url"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -112,14 +113,12 @@ type SubmitResult struct {
 }
 
 // Submit an app-package for inspection
-func (c *Client) Submit(filename string, file io.Reader, cloud bool) (*SubmitResult, error) {
+func (c *Client) Submit(filename string, file io.Reader) (*SubmitResult, error) {
 
-	formdata := map[string]string{}
-	if cloud {
-		formdata["included_tags"] = "cloud"
+	formdata := url.Values{
+		"included_tags": []string{"cloud", "self-service", "private_app"},
 	}
-
-	resp, err := c.R().SetAuthToken(c.token).SetMultipartFormData(formdata).
+	resp, err := c.R().SetAuthToken(c.token).SetFormDataFromValues(formdata).
 		SetFileReader("app_package", filename, file).SetResult(&SubmitResult{}).Post("/validate")
 	if err != nil {
 		return nil, fmt.Errorf("error while submit: %s", err)

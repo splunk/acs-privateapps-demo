@@ -16,7 +16,6 @@ type vet struct {
 	SplunkComUsername string `kong:"env='SPLUNK_COM_USERNAME',help='the splunkbase username'"`
 	SplunkComPassword string `kong:"env='SPLUNK_COM_PASSWORD',help='the splunkbase password'"`
 	JSONReportFile    string `kong:"help='the file to write the inspection report in json format',type='path'"`
-	ForSplunkCloud    bool   `kong:"env='FOR_SPLUNKCLOUD',help='perform inspections for splunk cloud',default='true'"`
 }
 
 func (v *vet) Run(c *context) error {
@@ -41,7 +40,7 @@ func (v *vet) Run(c *context) error {
 	if err != nil {
 		return err
 	}
-	submitRes, err := cli.Submit(filepath.Base(v.PackageFilePath), bytes.NewReader(pf), v.ForSplunkCloud)
+	submitRes, err := cli.Submit(filepath.Base(v.PackageFilePath), bytes.NewReader(pf))
 	if err != nil {
 		return err
 	}
@@ -64,11 +63,14 @@ func (v *vet) Run(c *context) error {
 			}
 		}
 	}
-
 	if status.Status == "SUCCESS" {
-		fmt.Printf("vetting completed successfully\n")
+		data, _ := json.MarshalIndent(status.Info, "", "    ")
+		fmt.Printf("vetting completed, summary: \n%s\n", string(data))
+		if status.Info.Failure > 0 || status.Info.Error > 0 {
+			err = fmt.Errorf("vetting failed (failures=%d, errors=%d)", status.Info.Failure, status.Info.Error)
+		}
 	} else {
-		err = fmt.Errorf("vetting failed with status='%s'", status.Status)
+		err = fmt.Errorf("vetting failed to complete (status='%s')", status.Status)
 	}
 
 	if v.JSONReportFile != "" {
