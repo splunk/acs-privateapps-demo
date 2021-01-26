@@ -19,7 +19,7 @@ jobs:
     - name: Generate Package
       run: make generate-app-package
 
-    - name: Vet Package
+    - name: Vet Package - AppInspect
       env:
         SPLUNK_COM_USERNAME: ${{ secrets.SPLUNK_COM_USERNAME }}
         SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
@@ -31,7 +31,7 @@ jobs:
         name: report.json
         path: report.json
 
-    - name: Install App
+    - name: Install App - ACS
       env:
         SPLUNK_COM_USERNAME: ${{ secrets.SPLUNK_COM_USERNAME }}
         SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
