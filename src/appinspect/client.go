@@ -116,7 +116,7 @@ type SubmitResult struct {
 func (c *Client) Submit(filename string, file io.Reader) (*SubmitResult, error) {
 
 	formdata := url.Values{
-		"included_tags": []string{"cloud", "self-service", "private_app"},
+		"included_tags": []string{"private_app"},
 	}
 	resp, err := c.R().SetAuthToken(c.token).SetFormDataFromValues(formdata).
 		SetFileReader("app_package", filename, file).SetResult(&SubmitResult{}).Post("/validate")
