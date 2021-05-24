@@ -2,7 +2,7 @@ build-cloudctl:
 	go build -o cloudCtl ./src/cmd
 
 generate-app-package:
-	tar -czvf app-package.tar.gz testapp
+	tar zcf app-package.tar.gz testapp
 
 inspect-app:
 	./cloudCtl vet app-package.tar.gz --json-report-file=report.json
