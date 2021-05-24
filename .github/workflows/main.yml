@@ -42,7 +42,7 @@ jobs:
         SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
         STACK_TOKEN: ${{ secrets.STACK_TOKEN }}
         STACK_NAME: ${{ secrets.STACK_NAME }}
-        ACS_URL: http://localhost:8443
+        ACS_URL: http://localhost:8444
       run: make install-app
 
 
