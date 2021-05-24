@@ -27,7 +27,7 @@ jobs:
       env:
         SPLUNK_COM_USERNAME: ${{ secrets.SPLUNK_COM_USERNAME }}
         SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
-        STACK_NAME: anekkanti-test1
+        STACK_NAME: ${{ secrets.STACK_NAME }}
       run: make inspect-app
 
     - uses: actions/upload-artifact@v2
@@ -41,7 +41,7 @@ jobs:
         SPLUNK_COM_USERNAME: ${{ secrets.SPLUNK_COM_USERNAME }}
         SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
         STACK_TOKEN: ${{ secrets.STACK_TOKEN }}
-        STACK_NAME: anekkanti-test1
+        STACK_NAME: ${{ secrets.STACK_NAME }}
         ACS_URL: http://localhost:8443
       run: make install-app
 
