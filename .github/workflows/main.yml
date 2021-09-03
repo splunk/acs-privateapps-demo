@@ -42,7 +42,7 @@ jobs:
         SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
         STACK_TOKEN: ${{ secrets.STACK_TOKEN }}
         STACK_NAME: ${{ secrets.STACK_NAME }}
-        ACS_URL: https://staging.admin.splunk.com
+        ACS_URL: https://admin.splunk.com
       run: make install-app
 
 
