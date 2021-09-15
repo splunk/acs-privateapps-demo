@@ -48,7 +48,7 @@ func NewWithURL(acsURL, token string) *Client {
 func (c *Client) InstallApp(stack, token, packageFileName string, packageReader io.Reader) error {
 	resp, err := c.resty.R().SetFormData(map[string]string{"token": token}).
 		SetFileReader("package", packageFileName, packageReader).
-		Post("/" + stack + "/adminconfig/v1/apps")
+		Post("/" + stack + "/adminconfig/v2beta1/apps")
 	if err != nil {
 		return fmt.Errorf("error while installing app: %s", err)
 	}
@@ -68,7 +68,7 @@ type App struct {
 
 // ListApps ...
 func (c *Client) ListApps(stack string) (map[string]App, error) {
-	resp, err := c.resty.R().SetResult(&map[string]App{}).Get("/" + stack + "/adminconfig/v1/apps")
+	resp, err := c.resty.R().SetResult(&map[string]App{}).Get("/" + stack + "/adminconfig/v2beta1/apps")
 	if err != nil {
 		return nil, fmt.Errorf("error while listing app: %s", err)
 	}
@@ -84,7 +84,7 @@ func (c *Client) ListApps(stack string) (map[string]App, error) {
 
 // DescribeApp ...
 func (c *Client) DescribeApp(stack string, appName string) (*App, error) {
-	resp, err := c.resty.R().SetResult(&App{}).Get("/" + stack + "/adminconfig/v1/apps/" + appName)
+	resp, err := c.resty.R().SetResult(&App{}).Get("/" + stack + "/adminconfig/v2beta1/apps/" + appName)
 	if err != nil {
 		return nil, fmt.Errorf("error while describing app: %s", err)
 	}
@@ -100,7 +100,7 @@ func (c *Client) DescribeApp(stack string, appName string) (*App, error) {
 
 // UninstallApp ...
 func (c *Client) UninstallApp(stack string, appName string) error {
-	resp, err := c.resty.R().Delete("/" + stack + "/adminconfig/v1/apps/" + appName)
+	resp, err := c.resty.R().Delete("/" + stack + "/adminconfig/v2beta1/apps/" + appName)
 	if err != nil {
 		return fmt.Errorf("error while uninstalling app: %s", err)
 	}
