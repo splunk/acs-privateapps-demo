@@ -63,6 +63,7 @@ func (c *Client) InstallAppClassic(stack, token, packageFileName string, package
 func (c *Client) InstallAppVictoria(stack, token, packageFileName string, packageReader io.Reader) error {
 	resp, err := c.resty.R().SetHeader("Content-Type", "application/x-www-form-urlencoded").
 		SetHeader("Proxy-Authorization", token).
+		SetHeader("ACS-Legal-Ack", "Y").
 		SetBody(packageReader).
 		Post("/" + stack + "/adminconfig/v2/apps/victoria")
 	if err != nil {
