@@ -42,5 +42,5 @@ jobs:
         SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
         STACK_TOKEN: ${{ secrets.VICTORIA_STACK_TOKEN }}
         STACK_NAME: ${{ secrets.VICTORIA_STACK_NAME }}
-        ACS_URL: https://admin.splunk.com
+        ACS_URL: https://staging.admin.splunk.com
       run: make install-app
