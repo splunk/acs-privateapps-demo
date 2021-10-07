@@ -44,11 +44,27 @@ func NewWithURL(acsURL, token string) *Client {
 	}
 }
 
-// InstallApp ...
-func (c *Client) InstallApp(stack, token, packageFileName string, packageReader io.Reader) error {
+// InstallAppClassic installs an app on a classic (non-victoria) stack
+func (c *Client) InstallAppClassic(stack, token, packageFileName string, packageReader io.Reader) error {
 	resp, err := c.resty.R().SetFormData(map[string]string{"token": token}).
 		SetFileReader("package", packageFileName, packageReader).
-		Post("/" + stack + "/adminconfig/v2beta1/apps")
+		Post("/" + stack + "/adminconfig/v2/apps")
+	if err != nil {
+		return fmt.Errorf("error while installing app: %s", err)
+	}
+	if resp.IsError() {
+		return fmt.Errorf("error while submit: %s: %s", resp.Status(), resp.String())
+	}
+	return nil
+}
+
+// InstallAppVictoria installs an app on a Victoria stack
+// TODO consolidate classic/victoria into an ifc or a single function
+func (c *Client) InstallAppVictoria(stack, token, packageFileName string, packageReader io.Reader) error {
+	resp, err := c.resty.R().SetHeader("Content-Type", "application/x-www-form-urlencoded").
+		SetHeader("Proxy-Authorization", token).
+		SetBody(packageReader).
+		Post("/" + stack + "/adminconfig/v2/apps/victoria")
 	if err != nil {
 		return fmt.Errorf("error while installing app: %s", err)
 	}

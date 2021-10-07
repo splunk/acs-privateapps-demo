@@ -40,9 +40,7 @@ jobs:
       env:
         SPLUNK_COM_USERNAME: ${{ secrets.SPLUNK_COM_USERNAME }}
         SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
-        STACK_TOKEN: ${{ secrets.STACK_TOKEN }}
-        STACK_NAME: ${{ secrets.STACK_NAME }}
+        STACK_TOKEN: ${{ secrets.VICTORIA_STACK_TOKEN }}
+        STACK_NAME: ${{ secrets.VICTORIA_STACK_NAME }}
         ACS_URL: https://admin.splunk.com
       run: make install-app
-
-

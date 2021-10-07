@@ -63,7 +63,7 @@ func (i *install) Run(c *context) error {
 	}
 
 	cli := acs.NewWithURL(i.AcsURL, i.StackToken)
-	return cli.InstallApp(i.StackName, ar.Data.Token, filepath.Base(i.PackageFilePath), bytes.NewReader(pf))
+	return cli.InstallAppVictoria(i.StackName, ar.Data.Token, filepath.Base(i.PackageFilePath), bytes.NewReader(pf))
 }
 
 type uninstall struct {
