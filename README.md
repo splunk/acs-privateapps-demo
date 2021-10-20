@@ -18,4 +18,3 @@ The environment needs to be configured with a few variables. If leveraging this 
 * STACK_TOKEN - the [jwt token](https://docs.splunk.com/Documentation/Splunk/latest/Security/Setupauthenticationwithtokens) created on the stack.
 * ACS_URL - `https://admin.splunk.com`
 
-
