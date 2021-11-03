@@ -127,11 +127,19 @@ type SubmitResult struct {
 }
 
 // Submit an app-package for inspection
-func (c *Client) Submit(filename string, file io.Reader) (*SubmitResult, error) {
+func (c *Client) Submit(filename string, file io.Reader, isVictoria bool) (*SubmitResult, error) {
 
-	formdata := url.Values{
-		"included_tags": []string{"private_app"},
+	var formdata url.Values
+	if isVictoria {
+		formdata = url.Values{
+			"included_tags": []string{"cloud,self-service"},
+		}
+	} else {
+		formdata = url.Values{
+			"included_tags": []string{"private_app"},
+		}
 	}
+
 	resp, err := c.R().SetAuthToken(c.token).SetFormDataFromValues(formdata).
 		SetFileReader("app_package", filename, file).SetResult(&SubmitResult{}).Post("/validate")
 	if err != nil {

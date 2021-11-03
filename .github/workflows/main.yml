@@ -27,8 +27,7 @@ jobs:
       env:
         SPLUNK_COM_USERNAME: ${{ secrets.SPLUNK_COM_USERNAME }}
         SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
-        STACK_NAME: ${{ secrets.STACK_NAME }}
-      run: make inspect-app
+      run: make inspect-app # this can be changed to inspect-app-victoria to vet an app intended to be installed on a victoria stack
 
     - uses: actions/upload-artifact@v2
       if: ${{ always() }}
@@ -42,7 +41,4 @@ jobs:
         SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
         STACK_TOKEN: ${{ secrets.STACK_TOKEN }}
         STACK_NAME: ${{ secrets.STACK_NAME }}
-        ACS_URL: https://admin.splunk.com
-      run: make install-app
-
-
+      run: make install-app # this can be changed to install-app-victoria to install an app on a victoria stack

@@ -26,7 +26,8 @@ type get struct {
 	StackName  string `kong:"arg,help='the splunk cloud stack'"`
 	AppName    string `kong:"arg,optional,help='the app'"`
 	StackToken string `kong:"env='STACK_TOKEN',help='the stack sc_admin jwt token'"`
-	AcsURL     string `kong:"env='ACS_URL',help='the acs url',default:'http://localhost:8443/'"`
+	AcsURL     string `kong:"env='ACS_URL',help='the acs url',default='https://admin.splunk.com'"`
+	Victoria   bool   `kong:"help='whether the stack is a Victora stack'"`
 }
 
 func (g *get) Run(c *context) error {
@@ -38,7 +39,12 @@ func (g *get) Run(c *context) error {
 		fmt.Println("")
 	}
 
-	cli := acs.NewWithURL(g.AcsURL, g.StackToken)
+	var cli acs.Client
+	if g.Victoria {
+		cli = acs.NewVictoriaWithURL(g.AcsURL, g.StackToken)
+	} else {
+		cli = acs.NewClassicWithURL(g.AcsURL, g.StackToken)
+	}
 
 	var object interface{}
 	var err error
@@ -52,7 +58,6 @@ func (g *get) Run(c *context) error {
 		if err != nil {
 			return err
 		}
-
 	}
 
 	if data, e := json.MarshalIndent(object, "", "    "); e == nil {
