@@ -30,7 +30,8 @@ type install struct {
 	SplunkComPassword string `kong:"env='SPLUNK_COM_PASSWORD',help='the splunkbase password'"`
 	PackageFilePath   string `kong:"arg,help='the path to the app-package (tar.gz) file',type='path'"`
 	StackToken        string `kong:"env='STACK_TOKEN',help='the stack sc_admin jwt token'"`
-	AcsURL            string `kong:"env='ACS_URL',help='the acs url',default:'http://localhost:8443/'"`
+	AcsURL            string `kong:"env='ACS_URL',help='the acs url',default='https://admin.splunk.com'"`
+	Victoria          bool   `kong:"help='whether the stack is a Victora stack'"`
 }
 
 func (i *install) Run(c *context) error {
@@ -62,7 +63,12 @@ func (i *install) Run(c *context) error {
 		return err
 	}
 
-	cli := acs.NewWithURL(i.AcsURL, i.StackToken)
+	var cli acs.Client
+	if i.Victoria {
+		cli = acs.NewVictoriaWithURL(i.AcsURL, i.StackToken)
+	} else {
+		cli = acs.NewClassicWithURL(i.AcsURL, i.StackToken)
+	}
 	return cli.InstallApp(i.StackName, ar.Data.Token, filepath.Base(i.PackageFilePath), bytes.NewReader(pf))
 }
 
@@ -70,7 +76,8 @@ type uninstall struct {
 	StackName  string `kong:"arg,help='the splunk cloud stack'"`
 	AppName    string `kong:"arg,optional,help='the app'"`
 	StackToken string `kong:"env='STACK_TOKEN',help='the stack sc_admin jwt token'"`
-	AcsURL     string `kong:"env='ACS_URL',help='the acs url',default:'http://localhost:8443/'"`
+	AcsURL     string `kong:"env='ACS_URL',help='the acs url',default='https://admin.splunk.com'"`
+	Victoria   bool   `kong:"help='whether the stack is a Victora stack'"`
 }
 
 func (u *uninstall) Run(c *context) error {
@@ -82,6 +89,11 @@ func (u *uninstall) Run(c *context) error {
 		fmt.Println("")
 	}
 
-	cli := acs.NewWithURL(u.AcsURL, u.StackToken)
+	var cli acs.Client
+	if u.Victoria {
+		cli = acs.NewVictoriaWithURL(u.AcsURL, u.StackToken)
+	} else {
+		cli = acs.NewClassicWithURL(u.AcsURL, u.StackToken)
+	}
 	return cli.UninstallApp(u.StackName, u.AppName)
 }

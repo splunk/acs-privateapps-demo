@@ -21,34 +21,77 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-// Client to interface with the appinspect service
-type Client struct {
-	resty *resty.Client
-	token string
+type Client interface {
+	InstallApp(stack, token, packageFileName string, packageReader io.Reader) error
+	DescribeApp(stack string, appName string) (*App, error)
+	ListApps(stack string) ([]App, error)
+	UninstallApp(stack string, appName string) error
 }
 
-// Error ...
-type Error struct {
+// victoriaClient is a client used to interface with ACS for Victoria stacks
+type victoriaClient struct {
+	client
+}
+
+// classicClient is a client used to interface with ACS for Classic (non-Victoria) stacks
+type classicClient struct {
+	client
+}
+
+type client struct {
+	resty *resty.Client
+}
+
+type acsError struct {
 	Code        string `json:"code"`
 	Description string `json:"description"`
 }
 
-func (e *Error) Error() string {
+func (e *acsError) Error() string {
 	return fmt.Sprintf("%s: %s", e.Code, e.Description)
 }
 
-// NewWithURL client to interface with the appinspect service
-func NewWithURL(acsURL, token string) *Client {
-	return &Client{
-		resty: resty.New().SetHostURL(acsURL).SetError(&Error{}).SetAuthScheme("Bearer").SetAuthToken(token),
+func newClient(acsURL, token string) client {
+	return client{
+		resty: resty.New().SetHostURL(acsURL).SetError(&acsError{}).SetAuthScheme("Bearer").SetAuthToken(token),
 	}
 }
 
-// InstallApp ...
-func (c *Client) InstallApp(stack, token, packageFileName string, packageReader io.Reader) error {
+// NewVictoriaWithURL creates a new VictoriaClient
+func NewVictoriaWithURL(acsURL, token string) Client {
+	return &victoriaClient{
+		client: newClient(acsURL, token),
+	}
+}
+
+// NewClassicWithURL creates a new ClassicClient
+func NewClassicWithURL(acsURL, token string) Client {
+	return &classicClient{
+		client: newClient(acsURL, token),
+	}
+}
+
+// InstallApp installs an app on a classic stack
+func (c *classicClient) InstallApp(stack, token, packageFileName string, packageReader io.Reader) error {
 	resp, err := c.resty.R().SetFormData(map[string]string{"token": token}).
 		SetFileReader("package", packageFileName, packageReader).
-		Post("/" + stack + "/adminconfig/v2beta1/apps")
+		Post("/" + stack + "/adminconfig/v2/apps")
+	if err != nil {
+		return fmt.Errorf("error while installing app: %s", err)
+	}
+	if resp.IsError() {
+		return fmt.Errorf("error while submit: %s: %s", resp.Status(), resp.String())
+	}
+	return nil
+}
+
+// InstallApp installs an app on a victoria stack
+func (c *victoriaClient) InstallApp(stack, token, packageFileName string, packageReader io.Reader) error {
+	resp, err := c.resty.R().SetHeader("Content-Type", "application/x-www-form-urlencoded").
+		SetHeader("Proxy-Authorization", token).
+		SetHeader("ACS-Legal-Ack", "Y").
+		SetBody(packageReader).
+		Post("/" + stack + "/adminconfig/v2/apps/victoria")
 	if err != nil {
 		return fmt.Errorf("error while installing app: %s", err)
 	}
@@ -66,25 +109,46 @@ type App struct {
 	Version *string `json:"version,omitempty"`
 }
 
-// ListApps ...
-func (c *Client) ListApps(stack string) (map[string]App, error) {
-	resp, err := c.resty.R().SetResult(&map[string]App{}).Get("/" + stack + "/adminconfig/v2beta1/apps")
+// ListApps on a classic stack
+func (c *classicClient) ListApps(stack string) ([]App, error) {
+	return listApps(c.client, fmt.Sprintf("/%s/adminconfig/v2/apps", stack))
+}
+
+// ListApps on a victoria stack
+func (c *victoriaClient) ListApps(stack string) ([]App, error) {
+	return listApps(c.client, fmt.Sprintf("/%s/adminconfig/v2/apps/victoria", stack))
+}
+
+func listApps(c client, url string) ([]App, error) {
+	type listAppsResponse struct {
+		Apps []App
+	}
+	resp, err := c.resty.R().SetResult(&listAppsResponse{}).Get(url)
 	if err != nil {
-		return nil, fmt.Errorf("error while listing app: %s", err)
+		return nil, fmt.Errorf("error while listing apps: %s", err)
 	}
 	if resp.IsError() {
 		return nil, fmt.Errorf("error while listing apps: %s: %s", resp.Status(), resp.String())
 	}
-	apps, ok := resp.Result().(*map[string]App)
+	apps, ok := resp.Result().(*listAppsResponse)
 	if !ok {
 		return nil, fmt.Errorf("error while parsing response")
 	}
-	return *apps, nil
+	return apps.Apps, nil
 }
 
-// DescribeApp ...
-func (c *Client) DescribeApp(stack string, appName string) (*App, error) {
-	resp, err := c.resty.R().SetResult(&App{}).Get("/" + stack + "/adminconfig/v2beta1/apps/" + appName)
+// DescribeApp on a classic stack
+func (c *classicClient) DescribeApp(stack string, appName string) (*App, error) {
+	return describeApp(c.client, fmt.Sprintf("/%s/adminconfig/v2/apps/%s", stack, appName))
+}
+
+// DescribeApp on a classic stack
+func (c *victoriaClient) DescribeApp(stack string, appName string) (*App, error) {
+	return describeApp(c.client, fmt.Sprintf("/%s/adminconfig/v2/apps/victoria/%s", stack, appName))
+}
+
+func describeApp(c client, url string) (*App, error) {
+	resp, err := c.resty.R().SetResult(&App{}).Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("error while describing app: %s", err)
 	}
@@ -98,9 +162,18 @@ func (c *Client) DescribeApp(stack string, appName string) (*App, error) {
 	return app, nil
 }
 
-// UninstallApp ...
-func (c *Client) UninstallApp(stack string, appName string) error {
-	resp, err := c.resty.R().Delete("/" + stack + "/adminconfig/v2beta1/apps/" + appName)
+// UninstallApp on a classic stack
+func (c *classicClient) UninstallApp(stack string, appName string) error {
+	return uninstallApp(c.client, fmt.Sprintf("/%s/adminconfig/v2/apps/%s", stack, appName))
+}
+
+// UninstallApp on a victoria stack
+func (c *victoriaClient) UninstallApp(stack string, appName string) error {
+	return uninstallApp(c.client, fmt.Sprintf("/%s/adminconfig/v2/apps/victoria/%s", stack, appName))
+}
+
+func uninstallApp(c client, url string) error {
+	resp, err := c.resty.R().Delete(url)
 	if err != nil {
 		return fmt.Errorf("error while uninstalling app: %s", err)
 	}
