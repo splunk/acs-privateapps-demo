@@ -75,6 +75,7 @@ func NewClassicWithURL(acsURL, token string) Client {
 func (c *classicClient) InstallApp(stack, token, packageFileName string, packageReader io.Reader) error {
 	resp, err := c.resty.R().SetFormData(map[string]string{"token": token}).
 		SetFileReader("package", packageFileName, packageReader).
+		SetHeader("ACS-Legal-Ack", "Y").
 		Post("/" + stack + "/adminconfig/v2/apps")
 	if err != nil {
 		return fmt.Errorf("error while installing app: %s", err)
