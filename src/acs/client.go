@@ -89,7 +89,7 @@ func (c *classicClient) InstallApp(stack, token, packageFileName string, package
 // InstallApp installs an app on a victoria stack
 func (c *victoriaClient) InstallApp(stack, token, packageFileName string, packageReader io.Reader) error {
 	resp, err := c.resty.R().SetHeader("Content-Type", "application/x-www-form-urlencoded").
-		SetHeader("Proxy-Authorization", token).
+		SetHeader("X-Splunk-Authorization", token).
 		SetHeader("ACS-Legal-Ack", "Y").
 		SetBody(packageReader).
 		Post("/" + stack + "/adminconfig/v2/apps/victoria")
