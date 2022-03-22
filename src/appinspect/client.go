@@ -108,6 +108,8 @@ func Authenticate(username, password string) (*AuthenticateResult, error) {
 
 // Login to appinspect service
 func (c *Client) Login(username, password string) error {
+	fmt.Println("Username")
+	fmt.Println(username)
 	r, err := Authenticate(username, password)
 	if err != nil {
 		return err
@@ -129,6 +131,9 @@ type SubmitResult struct {
 // Submit an app-package for inspection
 func (c *Client) Submit(filename string, file io.Reader, isVictoria bool) (*SubmitResult, error) {
 
+	fmt.Println("Is Victoria? ")
+	fmt.Println(isVictoria)
+
 	var formdata url.Values
 	if isVictoria {
 		formdata = url.Values{
@@ -139,6 +144,8 @@ func (c *Client) Submit(filename string, file io.Reader, isVictoria bool) (*Subm
 			"included_tags": []string{"private_app"},
 		}
 	}
+
+	fmt.Println(formdata)
 
 	resp, err := c.R().SetAuthToken(c.token).SetFormDataFromValues(formdata).
 		SetFileReader("app_package", filename, file).SetResult(&SubmitResult{}).Post("/validate")

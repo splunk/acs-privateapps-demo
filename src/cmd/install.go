@@ -17,11 +17,12 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
+
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/splunk/acs-privateapps-demo/src/acs"
 	"github.com/splunk/acs-privateapps-demo/src/appinspect"
-	"io/ioutil"
-	"path/filepath"
 )
 
 type install struct {
@@ -69,6 +70,8 @@ func (i *install) Run(c *context) error {
 	} else {
 		cli = acs.NewClassicWithURL(i.AcsURL, i.StackToken)
 	}
+	fmt.Println("Installing App")
+	fmt.Println(i.Victoria)
 	return cli.InstallApp(i.StackName, ar.Data.Token, filepath.Base(i.PackageFilePath), bytes.NewReader(pf))
 }
 
