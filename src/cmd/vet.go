@@ -18,11 +18,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/AlecAivazis/survey/v2"
-	"github.com/splunk/acs-privateapps-demo/src/appinspect"
 	"io/ioutil"
 	"path/filepath"
 	"time"
+
+	"github.com/AlecAivazis/survey/v2"
+	"github.com/splunk/acs-privateapps-demo/src/appinspect"
 )
 
 type vet struct {
@@ -55,7 +56,7 @@ func (v *vet) Run(c *context) error {
 	if err != nil {
 		return err
 	}
-	submitRes, err := cli.Submit(filepath.Base(v.PackageFilePath), bytes.NewReader(pf), v.Victoria)
+	submitRes, err := cli.Submit(filepath.Base(v.PackageFilePath), bytes.NewReader(pf))
 	if err != nil {
 		return err
 	}
