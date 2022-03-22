@@ -30,7 +30,7 @@ jobs:
       run: echo ${{ secrets.VICTORIA_STACK_NAME }}
     
     - name: Print Stacks
-      run: run: echo ${{ secrets.STACK_NAME }}
+      run: echo ${{ secrets.STACK_NAME }}
 
     - name: Vet The Package - AppInspect
       env:
