@@ -29,6 +29,7 @@ jobs:
         SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
       run: echo ${{ secrets.SPLUNK_COM_USERNAME }}
       run: echo ${{ secrets.VICTORIA_STACK_NAME }}
+      run: echo ${{ secrets.STACK_NAME }}
       run: make inspect-app-victoria # this can be changed to inspect-app-victoria to vet an app intended to be installed on a victoria stack
 
     - uses: actions/upload-artifact@v2
