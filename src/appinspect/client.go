@@ -137,7 +137,7 @@ func (c *Client) Submit(filename string, file io.Reader, isVictoria bool) (*Subm
 	var formdata url.Values
 	if isVictoria {
 		formdata = url.Values{
-			"included_tags": []string{"cloud,self-service"},
+			"included_tags": []string{"private_app"},
 		}
 	} else {
 		formdata = url.Values{
