@@ -129,15 +129,14 @@ type SubmitResult struct {
 // Submit an app-package for inspection
 func (c *Client) Submit(filename string, file io.Reader, isVictoria bool) (*SubmitResult, error) {
 
-	var formdata url.Values
-	if isVictoria {
-		formdata = url.Values{
-			"included_tags": []string{"cloud,self-service"},
-		}
-	} else {
-		formdata = url.Values{
-			"included_tags": []string{"private_app"},
-		}
+	/*
+		This app inspect client uses tag "private_app" which leverages APAV and skips manual checks.
+		Note: Victoria stacks must be on butterfinger (8.2.2112) onwards to use this client. For Victoria stacks
+		pre-butterfinger, app inspect included_tags is "cloud,self-service". No restriction for classic expreince,
+		i.e included_tags is always "private_app" regardless of stack version.
+	*/
+	var formdata = url.Values{
+		"included_tags": []string{"private_app"},
 	}
 
 	resp, err := c.R().SetAuthToken(c.token).SetFormDataFromValues(formdata).

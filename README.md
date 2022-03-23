@@ -11,7 +11,9 @@ The pipeline primarily consists of 4 steps:
 
 The steps of the pipeline can be found [here](https://github.com/splunk/acs-privateapps-demo/blob/main/.github/workflows/main.yml).
 
-Note that a few steps (app-vetting and app-installation) have Victoria and Classic variations in the Makefile.
+## Note
+* Few steps (app-vetting and app-installation) have Victoria and Classic variations in the Makefile.
+* For Stacks in Victoria Experience: Make sure your Victoria stack in at least on Butterfinger (8.2.2112) to use this github demo.
 
 ## Setting up the environment
 The environment needs to be configured with a few variables. If leveraging this from a Github repository using Github Actions workflows, the variables will need to be set up as [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets). If running this locally, these values simply need to be set as environment variables:
