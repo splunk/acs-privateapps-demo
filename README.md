@@ -1,4 +1,4 @@
-# acs-privateapps-demo
+# acs-privateapps-demo (test update)
 
 This repository demonstrates how one can use [splunkcloud's self-service apis](https://www.splunk.com/en_us/blog/platform/splunk-cloud-self-service-announcing-the-new-admin-config-service-api.html) to build a pipeline that can continuously deploy Splunk apps to Splunk Enterprise Cloud stacks.
 
