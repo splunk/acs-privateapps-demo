@@ -160,9 +160,10 @@ func (c *Client) Submit(filename string, file io.Reader, isVictoria bool) (*Subm
 
 // StatusResult ...
 type StatusResult struct {
-	RequestID string `json:"request_id"`
-	Status    string `json:"status"`
-	Info      struct {
+	RequestID  string `json:"request_id"`
+	StatusCode int    `json:"status_code"`
+	Status     string `json:"status"`
+	Info       struct {
 		Error         int `json:"error"`
 		Failure       int `json:"failure"`
 		Skipped       int `json:"skipped"`
@@ -194,6 +195,7 @@ func (c *Client) Status(requestID string) (*StatusResult, error) {
 	if r, ok = resp.Result().(*StatusResult); !ok {
 		return nil, fmt.Errorf("error while getting status: failed to parse response")
 	}
+	r.StatusCode = resp.StatusCode()
 	return r, nil
 }
 
