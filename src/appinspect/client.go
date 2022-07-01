@@ -185,10 +185,14 @@ func (c *Client) Status(requestID string) (*StatusResult, error) {
 		return nil, fmt.Errorf("error while getting status: %s", err)
 	}
 	if resp.IsError() {
-		if e, ok := resp.Error().(*Error); ok {
-			return nil, fmt.Errorf("error while getting status: %s", e)
+		r := &StatusResult{
+			RequestID:  requestID,
+			StatusCode: resp.StatusCode(),
 		}
-		return nil, fmt.Errorf("error while getting status: %s", resp.Status())
+		if e, ok := resp.Error().(*Error); ok {
+			return r, fmt.Errorf("error while getting status: %s", e)
+		}
+		return r, fmt.Errorf("error while getting status: %s", resp.Status())
 	}
 	var r *StatusResult
 	var ok bool
