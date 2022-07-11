@@ -26,6 +26,14 @@ const (
 	appInspectBaseURL = "https://appinspect.splunk.com/v1/app"
 )
 
+type ClientInterface interface {
+	Login(username string, password string) error
+	SetToken(token string)
+	Submit(filename string, file io.Reader, isVictoria bool) (*SubmitResult, error)
+	Status(requestID string) (*StatusResult, error)
+	ReportJSON(requestID string) (*ReportJSONResult, error)
+}
+
 // Client to interface with the appinspect service
 type Client struct {
 	*resty.Client
@@ -61,6 +69,10 @@ func NewWithToken(token string) *Client {
 	c := New()
 	c.token = token
 	return c
+}
+
+func (c *Client) SetToken(token string) {
+	c.token = token
 }
 
 // AuthenticateResult ...
