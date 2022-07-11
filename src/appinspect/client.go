@@ -71,6 +71,7 @@ func NewWithToken(token string) *Client {
 	return c
 }
 
+// This is helpful for mocking appinspect client
 func (c *Client) SetToken(token string) {
 	c.token = token
 }
