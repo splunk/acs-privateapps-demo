@@ -19,4 +19,4 @@ The steps of the pipeline can be found [here](https://github.com/splunk/acs-priv
 The environment needs to be configured with a few variables. If leveraging this from a Github repository using Github Actions workflows, the variables will need to be set up as [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets). If running this locally, these values simply need to be set as environment variables:
 * SPLUNK_COM_USERNAME / SPLUNK_COM_PASSWORD - the [splunk.com](https://login.splunk.com/) credentials to use for authentication to perform app inspection.
 * STACK_NAME - the name of the Splunk Cloud stack where you want to install/update the app package on.
-* STACK_TOKEN - the [jwt token](https://docs.splunk.com/Documentation/Splunk/latest/Security/Setupauthenticationwithtokens) created on the stack.
+* STACK_TOKEN a - the [jwt token](https://docs.splunk.com/Documentation/Splunk/latest/Security/Setupauthenticationwithtokens) created on the stack.
