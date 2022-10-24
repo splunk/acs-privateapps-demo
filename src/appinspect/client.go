@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"strings"
 
 	"github.com/go-resty/resty/v2"
 )
@@ -148,8 +149,15 @@ func (c *Client) Submit(filename string, file io.Reader, isVictoria bool) (*Subm
 		pre-butterfinger, app inspect included_tags is "cloud,self-service". No restriction for classic expreince,
 		i.e included_tags is always "private_app" regardless of stack version.
 	*/
+	var includedTags []string
+	if isVictoria {
+		includedTags = []string{"private_victoria"}
+	} else {
+		includedTags = []string{"private_classic"}
+	}
+
 	var formdata = url.Values{
-		"included_tags": []string{"private_app"},
+		"included_tags": includedTags,
 	}
 
 	resp, err := c.R().SetAuthToken(c.token).SetFormDataFromValues(formdata).
@@ -171,9 +179,20 @@ func (c *Client) Submit(filename string, file io.Reader, isVictoria bool) (*Subm
 	return r, nil
 }
 
+type ShaId struct {
+	Sha         string
+	IncludeTags []string
+}
+
+type addIdResult struct {
+	ShaId
+	RequestID string
+}
+
 // StatusResult ...
 type StatusResult struct {
 	RequestID  string `json:"request_id"`
+	Sha        string `json:"sha"`
 	StatusCode int    `json:"status_code"`
 	Status     string `json:"status"`
 	Info       struct {
@@ -192,14 +211,23 @@ type StatusResult struct {
 }
 
 // Status of an app-package inspection
-func (c *Client) Status(requestID string) (*StatusResult, error) {
-	resp, err := c.R().SetAuthToken(c.token).SetResult(&StatusResult{}).Get("/validate/status/" + requestID)
+func (c *Client) Status(statusBy interface{}) (*StatusResult, error) {
+	request := c.R().SetAuthToken(c.token).SetResult(&StatusResult{})
+	request.Method = resty.MethodGet
+	request.URL = "/validate/status/"
+
+	idResult, err := addIdToRequest(request, statusBy)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := request.Send()
 	if err != nil {
 		return nil, fmt.Errorf("error while getting status: %s", err)
 	}
 	if resp.IsError() {
 		r := &StatusResult{
-			RequestID:  requestID,
+			RequestID:  idResult.RequestID,
+			Sha:        idResult.Sha,
 			StatusCode: resp.StatusCode(),
 		}
 		if e, ok := resp.Error().(*Error); ok {
@@ -307,8 +335,39 @@ type ReportJSONResult struct {
 }
 
 // ReportJSON of an app-package inspection
-func (c *Client) ReportJSON(requestID string) (*ReportJSONResult, error) {
-	resp, err := c.R().SetAuthToken(c.token).SetResult(&ReportJSONResult{}).Get("/report/" + requestID)
+func (c *Client) ReportJSON(reportBy interface{}) (*ReportJSONResult, error) {
+	resp, err := c.report(reportBy, "application/json")
+	if err != nil {
+		return nil, err
+	}
+	var r *ReportJSONResult
+	var ok bool
+	if r, ok = resp.Result().(*ReportJSONResult); !ok {
+		return nil, fmt.Errorf("error while getting json report: failed to parse response")
+	}
+	return r, nil
+}
+
+// ReportHTML of an app-package inspection
+func (c *Client) ReportHTML(reportBy interface{}) ([]byte, error) {
+	resp, err := c.report(reportBy, "text/html")
+	if err != nil {
+		return nil, err
+	}
+	return resp.Body(), nil
+}
+
+func (c *Client) report(reportBy interface{}, contentType string) (*resty.Response, error) {
+	request := c.R().SetAuthToken(c.token).SetResult(&ReportJSONResult{})
+	request.Method = resty.MethodGet
+	request.URL = "/report/"
+	request.SetHeader("Content-Type", contentType)
+
+	if _, err := addIdToRequest(request, reportBy); err != nil {
+		return nil, err
+	}
+
+	resp, err := request.Send()
 	if err != nil {
 		return nil, fmt.Errorf("error while getting json report: %s", err)
 	}
@@ -318,10 +377,24 @@ func (c *Client) ReportJSON(requestID string) (*ReportJSONResult, error) {
 		}
 		return nil, fmt.Errorf("error while getting json report: %s", resp.Status())
 	}
-	var r *ReportJSONResult
-	var ok bool
-	if r, ok = resp.Result().(*ReportJSONResult); !ok {
-		return nil, fmt.Errorf("error while getting json report: failed to parse response")
+	return resp, nil
+}
+
+func addIdToRequest(r *resty.Request, id interface{}) (*addIdResult, error) {
+	result := new(addIdResult)
+	switch value := id.(type) {
+	case string:
+		result.RequestID = value
+		r.URL += value
+	case ShaId:
+		result.Sha = value.Sha
+		result.IncludeTags = value.IncludeTags
+		r.URL += value.Sha
+		if value.IncludeTags != nil {
+			r.SetQueryParam("included_tags", strings.Join(value.IncludeTags, ","))
+		}
+	default:
+		return nil, fmt.Errorf("can't conver id to proper format: %s", id)
 	}
-	return r, nil
+	return result, nil
 }
