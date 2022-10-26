@@ -394,7 +394,7 @@ func addIdToRequest(r *resty.Request, id interface{}) (*addIdResult, error) {
 			r.SetQueryParam("included_tags", strings.Join(value.IncludeTags, ","))
 		}
 	default:
-		return nil, fmt.Errorf("can't conver id to proper format: %s", id)
+		return nil, fmt.Errorf("can't add id to request: unknown type %q", id)
 	}
 	return result, nil
 }
