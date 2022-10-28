@@ -31,8 +31,9 @@ type ClientInterface interface {
 	Login(username string, password string) error
 	SetToken(token string)
 	Submit(filename string, file io.Reader, isVictoria bool) (*SubmitResult, error)
-	Status(requestID string) (*StatusResult, error)
-	ReportJSON(requestID string) (*ReportJSONResult, error)
+	Status(statusBy interface{}) (*StatusResult, error)
+	ReportJSON(reportBy interface{}) (*ReportJSONResult, error)
+	ReportHTML(reportBy interface{}) ([]byte, error)
 }
 
 // Client to interface with the appinspect service

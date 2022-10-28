@@ -15,6 +15,10 @@ func getClient() *Client {
 	return client
 }
 
+func TestClientImplementsInterface(t *testing.T) {
+	var _ ClientInterface = (*Client)(nil)
+}
+
 func TestStatusById(t *testing.T) {
 	assert := assert.New(t)
 	requestId := "Foo"
