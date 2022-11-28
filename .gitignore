@@ -17,3 +17,6 @@ vendor/
 app-package.tar.gz
 report.json
 cloudCtl
+
+# GitHub Action Runner
+actions-runner/
