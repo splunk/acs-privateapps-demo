@@ -22,7 +22,7 @@ The environment needs to be configured with a few variables. If leveraging this 
 * STACK_TOKEN - the [jwt token](https://docs.splunk.com/Documentation/Splunk/latest/Security/Setupauthenticationwithtokens) created on the stack.
 
 
-## Generating a new tag
+## Publishing a new version
 This repository has been used as dependencies for other projects.
 
 To manage the dependencies easily by specifying different versions for this module, we will use the module version numbering as recommended by Go - https://go.dev/doc/modules/version-numbers. The versioning will be done using GitHub tags.
