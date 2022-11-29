@@ -1,0 +1,22 @@
+---
+
+name: Release Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        required: true
+        description: 'Release version'
+
+jobs:
+  tag-commit:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v2
+
+    - name: Bump version and push tag
+      run: |
+        git tag ${{ github.event.inputs.tag }}
+        git push origin ${{ github.event.inputs.tag }}
