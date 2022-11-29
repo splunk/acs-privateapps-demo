@@ -20,3 +20,17 @@ The environment needs to be configured with a few variables. If leveraging this 
 * SPLUNK_COM_USERNAME / SPLUNK_COM_PASSWORD - the [splunk.com](https://login.splunk.com/) credentials to use for authentication to perform app inspection.
 * STACK_NAME - the name of the Splunk Cloud stack where you want to install/update the app package on.
 * STACK_TOKEN - the [jwt token](https://docs.splunk.com/Documentation/Splunk/latest/Security/Setupauthenticationwithtokens) created on the stack.
+
+
+## Generating a new tag
+This repository has been used as dependencies for other projects.
+
+To manage the dependencies easily by specifying different versions for this module, we will use the module version numbering as recommended by Go - https://go.dev/doc/modules/version-numbers. The versioning will be done using GitHub tags.
+
+To create a new tag, run the following command:
+```shell
+$ git tag vx.x.x
+$ git push origin vx.x.x
+```
+
+Alternatively, you can use the GitHub action `Release Package` to release generate new tags.
