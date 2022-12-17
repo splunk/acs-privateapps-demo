@@ -1,0 +1,49 @@
+---
+
+name: ACS CLI Demo
+
+on: workflow_dispatch
+
+env:
+  STACK_NAME: ${{ secrets.VICTORIA_STACK_NAME }}
+
+jobs:
+  install-app-classic:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v2
+      
+    - name: Generate Package
+      run: make generate-app-package
+
+    - name: Install Homebrew
+      run: |
+        echo "Installing homebrew"
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+        test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
+        test -d /home/linuxbrew/.linuxbrew && eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+        echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
+        echo "/home/linuxbrew/.linuxbrew/bin" >> $GITHUB_PATH
+        brew --version
+
+    - name: Install ACS CLI
+      run: |
+        echo "Installing ACS CLI from Homebrew"
+        brew tap splunk/tap
+        brew install acs
+
+    - name: Configure stack in ACS CLI
+      run: |
+        acs config add-stack $STACK_NAME --use
+
+    - name: Authenticate ACS CLI with ACS
+      env:
+        STACK_TOKEN: ${{ secrets.VICTORIA_STACK_TOKEN }}
+      run: acs login
+
+    - name: Install The App On Stack using CLI
+      env:
+        SPLUNK_USERNAME: ${{ secrets.SPLUNK_COM_USERNAME }}
+        SPLUNK_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
+      run: acs apps install private --app-package ./app-package.tar.gz --acs-legal-ack Y 
