@@ -2,14 +2,23 @@
 
 This repository demonstrates how one can use [Splunkcloud's self-service apis](https://www.splunk.com/en_us/blog/platform/splunk-cloud-self-service-announcing-the-new-admin-config-service-api.html) and [ACS CLI](https://docs.splunk.com/Documentation/SplunkCloud/latest/Config/ACSCLI) to build a pipeline that can continuously deploy Splunk apps to Splunk Enterprise Cloud stacks.
 
-## Steps
-The pipeline primarily consists of 4 steps:
+## Workflows
+
+### [InstallApp](./.github/workflows/main.yml)
+The workflow primarily consists of 4 steps:
 1. Build cloudctl (`make build-cloudctl`), the CLI that will be used for the remaining steps -- this step assumes that [go](https://golang.org) is installed.
 1. Package the app artifacts into a tar gz archive (`make generate-app-package`) -- this step assumes there is a top-level directory called `testapp` which contains the app.
 1. Upload the app-package to the app inspect service and wait for the inspection report (`make inspect-app`) -- this step assumes the existence of the environment variables defined below.
 1. If the inspection is successful, install/update the app on the stack using the self-serive apis (`make install-app`) -- this step also assumes the existence of the environment variables defined below.
 
-The steps of the pipeline can be found [here](https://github.com/splunk/acs-privateapps-demo/blob/main/.github/workflows/main.yml).
+### [ACS CLI Demo](./github/workflows/acs-demo.yml)
+The workflow consists of the following steps:
+1.  Package the app artifacts into a tar gz archive (`make generate-app-package`) -- this step assumes there is a top-level directory called `testapp` which contains the app.
+2. Install [Homebrew on Linux](https://docs.brew.sh/Homebrew-on-Linux).
+3. Install [ACS CLI](https://docs.splunk.com/Documentation/SplunkCloud/latest/Config/ACSCLI#Install_or_upgrade_the_ACS_CLI) from Homebrew.
+4. Configure ACS CLI (setup stack and required credentials)
+5. Inspect and install app using ACS CLI `acs apps install private` command.
+
 
 ## Note
 * Few steps (app-vetting and app-installation) have Victoria and Classic variations in the Makefile.
