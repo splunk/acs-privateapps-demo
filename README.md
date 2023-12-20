@@ -11,7 +11,7 @@ The workflow primarily consists of 4 steps:
 1. Upload the app-package to the app inspect service and wait for the inspection report (`make inspect-app`) -- this step assumes the existence of the environment variables defined below.
 1. If the inspection is successful, install/update the app on the stack using the self-serive apis (`make install-app`) -- this step also assumes the existence of the environment variables defined below.
 
-### [ACS CLI Demo](./github/workflows/acs-demo.yml)
+### [ACS CLI Demo](./.github/workflows/acs-demo.yml)
 The workflow consists of the following steps:
 1.  Package the app artifacts into a tar gz archive (`make generate-app-package`) -- this step assumes there is a top-level directory called `testapp` which contains the app.
 2. Install [Homebrew on Linux](https://docs.brew.sh/Homebrew-on-Linux).
