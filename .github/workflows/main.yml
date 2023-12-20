@@ -7,7 +7,7 @@ on: [push]
 jobs:
 
   install:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout Repo
       uses: actions/checkout@v2
@@ -15,7 +15,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.15
+        go-version: 1.18
 
     - name: Build cloudCtl
       run: make build-cloudctl
@@ -41,4 +41,5 @@ jobs:
         SPLUNK_COM_PASSWORD: ${{ secrets.SPLUNK_COM_PASSWORD }}
         STACK_TOKEN: ${{ secrets.VICTORIA_STACK_TOKEN }}
         STACK_NAME: ${{ secrets.VICTORIA_STACK_NAME }}
+        ACS_URL: ${{ secrets.ACS_URL }}
       run: make install-app-victoria # this can be changed to install-app to install an app on a classic stack
